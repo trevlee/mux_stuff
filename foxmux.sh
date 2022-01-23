@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 ### REF: 'man tmux' && https://gist.github.com/todgru/6224848 ###
 
 # Note: mainly geared towards HTB
@@ -19,8 +21,15 @@
 # attach-session -> attach
 # C-m -> execute
 
+# project name
+project="foxtrot"
+
 # session var
-session="project1"
+session=$project
+
+# setup working dir
+mkdir -p $HOME/htb/$session/{masscan,nmap,pcaps}
+cd $HOME/htb/$session
 
 # instantiate tmux
 tmux start
@@ -52,7 +61,7 @@ tmux selectp -t 2
 tmux splitw -v
 
 tmux selectp -t 0
-tmux send "masscan 127.0.0.1 -p1-65535,U:1-65535 --rate=1000 -e tun0"
+tmux send "masscan 127.0.0.1 -p1-65535,U:1-65535 -oG masscan/masscan_init --rate=1000 -e eth0"
 tmux selectp -t 1
 tmux send "nmap -sS -Pn --open -p- -T5 -oA nmap/nmap_agg 127.0.0.1"
 tmux selectp -t 2
@@ -81,7 +90,7 @@ tmux selectp -t 0
 
 # setup capture for window 4
 tmux selectw -t $session:4
-tmux send "tcpdump -i any -w /tmp/project_1.pcap" C-m
+tmux send "tcpdump -i any -w $PWD/pcaps/$project\_1.pcap" C-m
 
 # return to window 1
 tmux selectw -t $session:1
